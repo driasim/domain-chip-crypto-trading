@@ -15,7 +15,7 @@ from collections import Counter
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 import uvicorn
 
@@ -38,7 +38,24 @@ DOCTRINE_PACKETS_DIR = REPO_ROOT / "docs" / "doctrine-packets"
 
 app = FastAPI(title="Spark Domain Chip: Crypto Trading API")
 
+# ── API Key Auth Middleware ──────────────────────────────────────────────
+API_KEY = os.environ.get("DASHBOARD_API_KEY", "")
 
+if API_KEY:
+
+    @app.middleware("http")
+    async def api_key_middleware(request: Request, call_next):
+        # Skip auth for the main HTML page and static routes
+        if request.url.path == "/" or not request.url.path.startswith("/api/"):
+            return await call_next(request)
+        key = request.headers.get("x-api-key", "")
+        if key != API_KEY:
+            from fastapi.responses import JSONResponse
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Unauthorized — provide x-api-key header"},
+            )
+        return await call_next(request)
 # ── helpers ──────────────────────────────────────────────────────────────
 def _json(path):
     try:
@@ -1762,4 +1779,4 @@ window.addEventListener('DOMContentLoaded', () => { loadGraph(); });
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8502)
+    uvicorn.run(app, host="127.0.0.1", port=8502)
