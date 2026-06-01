@@ -338,14 +338,30 @@ class LLMCodeGenerator:
             return False
 
         # Must not contain dangerous operations
+        # Normalize whitespace to catch trivial bypasses like "import  os"
+        normalized = code.replace("  ", " ").replace("\t", " ")
         forbidden = [
             "import os", "import sys", "import subprocess",
+            "import shutil", "import socket", "import ctypes",
+            "import base64", "import pickle", "import signal",
+            "import tempfile", "import cgi",
             "open(", "exec(", "eval(", "__import__",
-            "os.system", "os.popen", "shutil",
-            "requests.", "urllib.", "socket.",
+            "__builtins__", "__subclass", "__base__",
+            "__mro__", "__globals__", "__code__",
+            "os.system", "os.popen", "os.exec", "os.fork",
+            "os.kill", "os.chmod", "os.chown", "os.remove",
+            "os.unlink", "os.rmdir", "os.mkdir", "os.makedirs",
+            "os.environ", "os.getenv",
+            "shutil.", "socket.", "ctypes.",
+            "base64.", "pickle.",
+            "requests.", "urllib.", "httpx.",
+            "compile(", "__path__",
+            "subprocess.", "sys.modules", "sys.path",
+            "sys.stdin", "sys.stdout", "sys.stderr",
+            "pty.", "fcntl.", "termios.",
         ]
         for f in forbidden:
-            if f in code:
+            if f in normalized:
                 logger.warning("Guard contains forbidden pattern: %s", f)
                 return False
 
@@ -358,7 +374,19 @@ class LLMCodeGenerator:
 
         # Must return correct type when executed
         try:
-            namespace: dict[str, Any] = {}
+            # Restrict builtins to a safe subset — no __import__, open, exec, eval, etc.
+            safe_builtins: dict[str, Any] = {
+                "abs": abs, "all": all, "any": any, "bool": bool,
+                "dict": dict, "float": float, "int": int,
+                "len": len, "list": list, "max": max, "min": min,
+                "range": range, "round": round, "str": str,
+                "sum": sum, "tuple": tuple, "type": type, "zip": zip,
+                "True": True, "False": False, "None": None,
+                "isinstance": isinstance, "hasattr": hasattr,
+                "enumerate": enumerate, "sorted": sorted,
+                "reversed": reversed, "filter": filter, "map": map,
+            }
+            namespace: dict[str, Any] = {"__builtins__": safe_builtins}
             exec(code, namespace)
             guard_fn = namespace.get("guard")
             if not callable(guard_fn):
