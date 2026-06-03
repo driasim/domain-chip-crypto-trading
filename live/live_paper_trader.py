@@ -9,6 +9,7 @@ No API key needed, no real money involved. Pure observation + prediction.
 Usage:
     python live_paper_trader.py --assets BTC --per-strategy 3
     python live_paper_trader.py --assets BTC,ETH,SOL --per-strategy 5 --daemon
+    daemon.add_argument("--quiet", action="store_true", help="Suppress INFO-level output (default: False)")
 """
 
 from __future__ import annotations
