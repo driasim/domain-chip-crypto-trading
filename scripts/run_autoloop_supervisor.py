@@ -494,6 +494,7 @@ def main() -> None:
     parser.add_argument("--no-commit", action="store_true", help="Never commit from the supervisor run.")
     parser.add_argument("--disable-learning-loop", action="store_true", help="Skip the learning loop.")
     parser.add_argument("--disable-backtest-loop", action="store_true", help="Skip the backtest loop.")
+    parser.add_argument("--dry-run", action="store_true", help="Validate configuration without running loops")
     parser.add_argument("--disable-paper-trade-loop", action="store_true", help="Skip the paper-trade loop.")
     parser.add_argument("--disable-doctrine-ingest", action="store_true", help="Compatibility alias for --disable-learning-loop.")
     args = parser.parse_args()
