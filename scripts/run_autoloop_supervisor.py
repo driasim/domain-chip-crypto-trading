@@ -495,6 +495,7 @@ def main() -> None:
     parser.add_argument("--disable-learning-loop", action="store_true", help="Skip the learning loop.")
     parser.add_argument("--disable-backtest-loop", action="store_true", help="Skip the backtest loop.")
     parser.add_argument("--disable-paper-trade-loop", action="store_true", help="Skip the paper-trade loop.")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("--disable-doctrine-ingest", action="store_true", help="Compatibility alias for --disable-learning-loop.")
     args = parser.parse_args()
 
