@@ -1,0 +1,10 @@
+--- live_paper_trader.py
++++ live_paper_trader.py
+@@ -726,6 +726,7 @@
+     targets.add_argument("--per-strategy", type=int, default=5, help="Top N agents per strategy:tf combo (default: 5)")
++    targets.add_argument("--output", metavar="DIR", help="Override output directory for logs and state files")
+     daemon = parser.add_argument_group("daemon / run mode")
+ 
+ 
+ 
+ 
