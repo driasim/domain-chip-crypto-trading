@@ -496,7 +496,7 @@ def main() -> None:
     parser.add_argument("--disable-backtest-loop", action="store_true", help="Skip the backtest loop.")
     parser.add_argument("--disable-paper-trade-loop", action="store_true", help="Skip the paper-trade loop.")
     parser.add_argument("--disable-doctrine-ingest", action="store_true", help="Compatibility alias for --disable-learning-loop.")
-    parser.add_argument("--no-color", action="store_true", help="Disable colored output")
+    parser.add_argument("--config", "-c", default=None, help="Path to config file")
     args = parser.parse_args()
 
     policy = _policy()
